@@ -13,7 +13,6 @@
             font-family: 'Noto Serif KR', serif;
             overflow-y: scroll;
             height: 100vh;
-          
         }
         .container {
             display: flex;
@@ -38,13 +37,13 @@
             left: 50%;
             transform: translate(-50%, 0);
             color: #000;
-            font-weight: 600;
+            font-weight: 900;
             font-size: 1.0rem;
             line-height: 1.7;
             text-align: center;
-            padding: 3px;
+            padding: 10px;
             box-sizing: border-box;
-            max-width: 140%;
+            max-width: 80%;
             font-family:serif;
             background-color: transparent;
         }
@@ -78,52 +77,48 @@
         }
     </style>
     <script>
-    document.addEventListener("DOMContentLoaded", function () {
-        const stickyNotes = document.querySelectorAll('.sticky-note');
+        document.addEventListener("DOMContentLoaded", function() {
+            const stickyNotes = document.querySelectorAll('.sticky-note');
 
-        stickyNotes.forEach(note => {
-            let offsetX, offsetY, isDragging = false;
+            stickyNotes.forEach(note => {
+                let offsetX, offsetY, isDragging = false;
 
-            note.addEventListener('mousedown', (e) => {
-                isDragging = true;
-                const rect = note.getBoundingClientRect();
-                offsetX = e.clientX - rect.left;
-                offsetY = e.clientY - rect.top;
-                note.style.zIndex = 1000;
-                note.style.transition = 'none';
-            });
+                note.addEventListener('mousedown', (e) => {
+                    isDragging = true;
+                    offsetX = e.clientX - note.getBoundingClientRect().left;
+                    offsetY = e.clientY - note.getBoundingClientRect().top;
+                    note.style.zIndex = 1000;
+                    note.style.transition = 'none';
+                });
 
-            document.addEventListener('mousemove', (e) => {
-                if (isDragging) {
+                document.addEventListener('mousemove', (e) => {
+                    if (isDragging) {
+                        e.preventDefault();
+                        requestAnimationFrame(() => {
+                            const newLeft = e.clientX - offsetX;
+                            const newTop = e.clientY - offsetY;
+                            note.style.left = `${newLeft}px`;
+                            note.style.top = `${newTop}px`;
+                            note.style.transform = 'scale(1.05)';
+                        });
+                    }
+                });
+
+                document.addEventListener('mouseup', () => {
+                    if (isDragging) {
+                        isDragging = false;
+                        note.style.zIndex = '';
+                        note.style.transition = 'transform 0.1s ease-out';
+                        note.style.transform = 'scale(1)';
+                    }
+                });
+
+                note.addEventListener('dragstart', (e) => {
                     e.preventDefault();
-                    const container = note.parentElement;
-                    const containerRect = container.getBoundingClientRect();
-
-                    const newLeft = ((e.clientX - containerRect.left - offsetX) / containerRect.width) * 100;
-                    const newTop = ((e.clientY - containerRect.top - offsetY) / containerRect.height) * 100;
-
-                    note.style.left = `${Math.max(0, Math.min(newLeft, 200))}%`;
-                    note.style.top = `${Math.max(0, Math.min(newTop, 100))}%`;
-                    note.style.transform = 'scale(1.05)';
-                }
-            });
-
-            document.addEventListener('mouseup', () => {
-                if (isDragging) {
-                    isDragging = false;
-                    note.style.zIndex = '';
-                    note.style.transition = 'transform 0.1s ease-out';
-                    note.style.transform = 'scale(1)';
-                }
-            });
-
-            note.addEventListener('dragstart', (e) => {
-                e.preventDefault();
+                });
             });
         });
-    });
-</script>
-
+    </script>
 </head>
 <body>
     <div class="container">
